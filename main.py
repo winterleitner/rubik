@@ -40,6 +40,12 @@ class Rubik:
     def is_solved(self):
         return self.top.is_solved() and self.bottom.is_solved() and self.west.is_solved() and self.east.is_solved() and self.north.is_solved() and self.south.is_solved()
 
+    def correct_number(self):
+        correct = 0
+        for i in range(6):
+            correct = correct + self.get_side(i).correct_number()
+        return correct
+
     def validate(self):
         counts = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
         for i in range(6):
@@ -123,6 +129,14 @@ class Side:
 
         return True
 
+    def correct_number(self):
+        correct = 0
+        for r in self.fields:
+            for f in r:
+                if f == self.center:
+                    correct = correct + 1
+        return correct
+
     def get_neighboring_row(self, color):
         if color == self.center:
             raise IsSelfException
@@ -201,17 +215,17 @@ r = Rubik()
 
 # shuffle cube
 r.turn_counter_clock(0)
-r.turn_counter_clock(1)
-r.turn_counter_clock(2)
-r.turn_counter_clock(3)
-r.turn_counter_clock(4)
-r.turn_counter_clock(5)
-r.turn_clock(0)
+#r.turn_counter_clock(1)
+#r.turn_counter_clock(2)
+#r.turn_counter_clock(3)
+#r.turn_counter_clock(4)
+#r.turn_counter_clock(5)
+#r.turn_clock(0)
 r.turn_clock(1)
-r.turn_clock(2)
-r.turn_clock(3)
-r.turn_clock(4)
-r.turn_clock(5)
+#r.turn_clock(2)
+#r.turn_clock(3)
+#r.turn_clock(4)
+#r.turn_clock(5)
 
 #solvers
 
@@ -284,6 +298,61 @@ def rand_solve(rubik, states):
             print(path)
             return
 
+def correctify_solve(rubik, path=[], states=[]):
+    best = [-1, -1, rubik.correct_number()]
+    for dir in [0,1]:
+        for side in range(5):
+            if dir == 0:
+                rubik.turn_counter_clock(side)
+                if states.__contains__(rubik.get_id()):
+                    rubik.turn_clock(side)
+                else:
+                    states.add(rubik.get_id())
+                    val = rubik.correct_number()
+                    if (val >= best[2]):
+                        best[2] = val
+                        best[0] = dir
+                        best[1] = side
+                    rubik.turn_clock(side)
+
+            else:
+                rubik.turn_clock(side)
+                if states.__contains__(rubik.get_id()):
+                    rubik.turn_counter_clock(side)
+                else:
+                    states.add(rubik.get_id())
+                    val = rubik.correct_number()
+                    if (val >= best[2]):
+                        best[2] = val
+                        best[0] = dir
+                        best[1] = side
+                    rubik.turn_counter_clock(side)
+
+    if best[0] == -1:
+        print(r)
+        print("Correct:")
+        print(r.correct_number())
+        return False
+
+    dir = best[0]
+    side = best[1]
+
+    if dir == 0:
+        rubik.turn_counter_clock(side)
+        path.append(side.__str__() + "l")
+        print(side.__str__() + "l")
+
+    else:
+        rubik.turn_clock(side)
+        path.append(side.__str__() + "r")
+        print(side.__str__() + "r")
+
+    if rubik.is_solved():
+        print("SOLVED")
+        return True
+    else:
+        return correctify_solve(rubik, path=path, states=states)
+
 
 
 
@@ -294,4 +363,5 @@ states.add(r.get_id())
 
 states = set()
 states.add(r.get_id())
-rand_solve(r, states)
+#rand_solve(r, states)
+correctify_solve(r, states=states)
