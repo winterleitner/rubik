@@ -110,19 +110,6 @@ class Rubik:
             print(self.__str__())
 
 
-    def turn_top_left(self):
-        top = self.top.fields[0]
-        west = self.west.fields[0]
-        bottom = self.bottom.fields[0]
-        east = self.east.fields[0]
-
-        self.top.fields[0] = east
-        self.west.fields[0] = top
-        self.bottom.fields[0] = west
-        self.east.fields[0] = bottom
-        self.north.rotate_clock()
-
-
 class Side:
     def __init__(self, color):
         self.fields = [[color for i in range(3)] for j in range(3)]
