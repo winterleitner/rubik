@@ -215,13 +215,13 @@ r = Rubik()
 
 # shuffle cube
 r.turn_counter_clock(0)
-#r.turn_counter_clock(1)
+r.turn_counter_clock(1)
 #r.turn_counter_clock(2)
 #r.turn_counter_clock(3)
-#r.turn_counter_clock(4)
+r.turn_counter_clock(4)
 #r.turn_counter_clock(5)
 #r.turn_clock(0)
-r.turn_clock(1)
+#r.turn_clock(1)
 #r.turn_clock(2)
 #r.turn_clock(3)
 #r.turn_clock(4)
@@ -274,29 +274,28 @@ def dumb_solve(rubik, path=[], states=set()):
     print("Done!")
 
 # dumb random algorithm that does not work
-def rand_solve(rubik, states):
-    path = []
-    while(True):
-        dir = random.randint(0, 1)
-        side = random.randint(0,5)
-        if dir == 0:
-            rubik.turn_counter_clock(side)
-            if states.__contains__(rubik.get_id()):
-                rubik.turn_clock(side)
-            else:
-                states.add(rubik.get_id())
-                path.append(side.__str__() + "l")
-        else:
+def rand_solve(rubik, path=[], states=set()):
+    dir = random.randint(0, 1)
+    side = random.randint(0,5)
+    if dir == 0:
+        rubik.turn_counter_clock(side)
+        if states.__contains__(rubik.get_id()):
             rubik.turn_clock(side)
-            if states.__contains__(rubik.get_id()):
-                rubik.turn_counter_clock(side)
-            else:
-                states.add(rubik.get_id())
-                path.append(side.__str__() + "r")
-        if rubik.is_solved():
-            print(len(path))
-            print(path)
-            return
+        else:
+            states.add(rubik.get_id())
+            path.append(side.__str__() + "l")
+    else:
+        rubik.turn_clock(side)
+        if states.__contains__(rubik.get_id()):
+            rubik.turn_counter_clock(side)
+        else:
+            states.add(rubik.get_id())
+            path.append(side.__str__() + "r")
+    if rubik.is_solved():
+        print(len(path))
+        print(path)
+
+    return [dir, side]
 
 def correctify_solve(rubik, path=[], states=[]):
     best = [-1, -1, rubik.correct_number()]
@@ -329,10 +328,33 @@ def correctify_solve(rubik, path=[], states=[]):
                     rubik.turn_counter_clock(side)
 
     if best[0] == -1:
-        print(r)
-        print("Correct:")
-        print(r.correct_number())
-        return False
+
+        #Try random 3 steps
+        correct = rubik.correct_number()
+        for i in range(3):
+            npath = path.copy()
+            steps = []
+            steps.append(rand_solve(rubik, path=npath, states=states))
+            steps.append(rand_solve(rubik, path=npath, states=states))
+            steps.append(rand_solve(rubik, path=npath, states=states))
+            n_correct = rubik.correct_number()
+            if n_correct <= correct:
+                steps.reverse()
+                for step in steps:
+                    if step[0] == 0:
+                        rubik.turn_clock(step[1])
+                    else:
+                        rubik.turn_counter_clock(step[1])
+            else:
+                break
+
+        if n_correct <= correct:
+            print(rubik)
+            print(npath)
+            print("Correct:")
+            print(rubik.correct_number())
+            return False
+        return correctify_solve(rubik, path=npath, states=states)
 
     dir = best[0]
     side = best[1]
@@ -349,6 +371,7 @@ def correctify_solve(rubik, path=[], states=[]):
 
     if rubik.is_solved():
         print("SOLVED")
+        print(path)
         return True
     else:
         return correctify_solve(rubik, path=path, states=states)
