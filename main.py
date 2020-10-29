@@ -1,4 +1,3 @@
-import numpy as np
 import sys
 import random
 
@@ -210,51 +209,24 @@ class Side:
     def __str__(self):
         return self.fields[0].__str__() + "\n" + self.fields[1].__str__() + "\n" + self.fields[2].__str__()
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
+#intialize cube
 r = Rubik()
-print(r.get_id())
-print()
 
+# shuffle cube
 r.turn_counter_clock(0)
-#print("-")
-
-#r.turn_counter_clock(1)
-#print("-")
-#r.turn_counter_clock(2)
-#print("-")
-#r.turn_counter_clock(3)
-#print("-")
-#r.turn_counter_clock(4)
-#print("-")
-#r.turn_counter_clock(5)
-#print("-")
-#r.turn_clock(0)
-print("-")
+r.turn_counter_clock(1)
+r.turn_counter_clock(2)
+r.turn_counter_clock(3)
+r.turn_counter_clock(4)
+r.turn_counter_clock(5)
+r.turn_clock(0)
 r.turn_clock(1)
-print("-")
-#r.turn_clock(2)
-#print("-")
-#r.turn_clock(3)
-#print("-")
-#r.turn_clock(4)
-#print("-")
-#r.turn_clock(5)
-#print("-")
-#
-#
-#print(r.get_id())
-#
+r.turn_clock(2)
+r.turn_clock(3)
+r.turn_clock(4)
+r.turn_clock(5)
+
+#solvers
 
 def dumb_solve(rubik, path=[], states=set()):
     for i in range(6):
@@ -300,7 +272,7 @@ def dumb_solve(rubik, path=[], states=set()):
 
     print("Done!")
 
-## dumb random algorithm that does not work
+# dumb random algorithm that does not work
 def rand_solve(rubik, states):
     path = []
     while(True):
@@ -332,8 +304,7 @@ sys.setrecursionlimit(100100)
 states = set()
 states.add(r.get_id())
 #dumb_solve(r, states=states)
-print(r)
+
 states = set()
 states.add(r.get_id())
 rand_solve(r, states)
-print(r)
